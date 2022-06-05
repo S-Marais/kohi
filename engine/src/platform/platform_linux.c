@@ -29,132 +29,266 @@
 #include <vulkan/vulkan.h>
 #include "renderer/vulkan/vulkan_types.inl"
 
-#define MAX_KEY_LOOKUP 232
+static const u32 key_lookup_table[KEYS_MAX_KEYS] = {
+        /** @brief The backspace key. */
+        0xff08,
+        /** @brief The enter key. */
+        0xff0d,
+        /** @brief The tab key. */
+        0xff09,
+        /** @brief The shift key. */
+        KEYS_MAX_KEYS,
+        /** @brief The Control/Ctrl key. */
+        KEYS_MAX_KEYS,
 
-static const u32 key_lookup_table[MAX_KEY_LOOKUP] = {
-        0xff08, KEY_BACKSPACE,
-        0xff0d, KEY_ENTER,
-        0xff09, KEY_TAB,
-        0xff13, KEY_PAUSE,
-        0xffe5, KEY_CAPITAL,
-        0xff1b, KEY_ESCAPE,
-        0xff7e, KEY_MODECHANGE,
-        0x0020, KEY_SPACE,
-        0xff55, KEY_PRIOR,
-        0xff56, KEY_NEXT,
-        0xff57, KEY_END,
-        0xff50, KEY_HOME,
-        0xff51, KEY_LEFT,
-        0xff52, KEY_UP,
-        0xff53, KEY_RIGHT,
-        0xff54, KEY_DOWN,
-        0xff60, KEY_SELECT,
-        0xff61, KEY_PRINT,
-        0xff62, KEY_EXECUTE,
-        0xff63, KEY_INSERT,
-        0xffff, KEY_DELETE,
-        0xff6a, KEY_HELP,
+        /** @brief The pause key. */
+        0xff13,
+        /** @brief The Caps Lock key. */
+        0xffe5,
 
-        0xffeb, KEY_LWIN,  // TODO: not sure this is right
-        0xffec, KEY_RWIN,
-        0xff9e, KEY_NUMPAD0,
-        0xff9c, KEY_NUMPAD1,
-        0xff99, KEY_NUMPAD2,
-        0xff9b, KEY_NUMPAD3,
-        0xff96, KEY_NUMPAD4,
-        0xff9d, KEY_NUMPAD5,
-        0xff98, KEY_NUMPAD6,
-        0xff95, KEY_NUMPAD7,
-        0xff97, KEY_NUMPAD8,
-        0xff9a, KEY_NUMPAD9,
-        0xffaa, KEY_MULTIPLY,
-        0xffab, KEY_ADD,
-        0xffac, KEY_SEPARATOR,
-        0xffad, KEY_SUBTRACT,
-        0xff9f, KEY_DECIMAL,
-        0xffaf, KEY_DIVIDE,
-        0xffbe, KEY_F1,
-        0xffbf, KEY_F2,
-        0xffc0, KEY_F3,
-        0xffc1, KEY_F4,
-        0xffc2, KEY_F5,
-        0xffc3, KEY_F6,
-        0xffc4, KEY_F7,
-        0xffc5, KEY_F8,
-        0xffc6, KEY_F9,
-        0xffc7, KEY_F10,
-        0xffc8, KEY_F11,
-        0xffc9, KEY_F12,
-        0xffca, KEY_F13,
-        0xffcb, KEY_F14,
-        0xffcc, KEY_F15,
-        0xffcd, KEY_F16,
-        0xffce, KEY_F17,
-        0xffcf, KEY_F18,
-        0xffd0, KEY_F19,
-        0xffd1, KEY_F20,
-        0xffd2, KEY_F21,
-        0xffd3, KEY_F22,
-        0xffd4, KEY_F23,
-        0xffd5, KEY_F24,
+        /** @brief The Escape key. */
+        0xff1b,
 
-        0xff7f, KEY_NUMLOCK,
-        0xff14, KEY_SCROLL,
+        KEYS_MAX_KEYS,
+        KEYS_MAX_KEYS,
+        KEYS_MAX_KEYS,
+        KEYS_MAX_KEYS,
 
-        0xffbd, KEY_NUMPAD_EQUAL,
+        /** @brief The spacebar key. */
+        0xff7e,
+        /** @brief The prior key. */
+        0xff55,
+        /** @brief The next key. */
+        0xff56,
+        /** @brief The end key. */
+        0xff57,
+        /** @brief The home key. */
+        0xff50,
+        /** @brief The left arrow key. */
+        0xff51,
+        /** @brief The up arrow key. */
+        0xff52,
+        /** @brief The right arrow key. */
+        0xff53,
+        /** @brief The down arrow key. */
+        0xff54,
+        /** @brief The select key. */
+        0xff60,
+        /** @brief The print key. */
+        0xff61,
+        /** @brief The execute key. */
+        0xff62,
+        /** @brief The snapshot key. */
+        KEYS_MAX_KEYS,
+        /** @brief The insert key. */
+        0xff63,
+        /** @brief The delete key. */
+        0xffff,
+        /** @brief The help key. */
+        0xff6A,
 
-        0xffe1, KEY_LSHIFT,
-        0xffe2, KEY_RSHIFT,
-        0xffe3, KEY_LCONTROL,
-        0xffe4, KEY_RCONTROL,
-        0xffe9, KEY_LALT,
-        0xfe03, KEY_RALT,
+        /** @brief The 0 key */
+        0x0030,
+        /** @brief The 1 key */
+        0x0031,
+        /** @brief The 2 key */
+        0x0032,
+        /** @brief The 3 key */
+        0x0033,
+        /** @brief The 4 key */
+        0x0034,
+        /** @brief The 5 key */
+        0x0035,
+        /** @brief The 6 key */
+        0x0036,
+        /** @brief The 7 key */
+        0x0037,
+        /** @brief The 8 key */
+        0x0038,
+        /** @brief The 9 key */
+        0x0039,
 
-        0x003b, KEY_SEMICOLON,
-        0x002b, KEY_PLUS,
-        0x002c, KEY_COMMA,
-        0x002d, KEY_MINUS,
-        0x002e, KEY_PERIOD,
-        0x002f, KEY_SLASH,
-        0x0060, KEY_GRAVE,
+        /** @brief The A key. */
+        0x0041,
+        /** @brief The B key. */
+        0x0042,
+        /** @brief The C key. */
+        0x0043,
+        /** @brief The D key. */
+        0x0044,
+        /** @brief The E key. */
+        0x0045,
+        /** @brief The F key. */
+        0x0046,
+        /** @brief The G key. */
+        0x0047,
+        /** @brief The H key. */
+        0x0048,
+        /** @brief The I key. */
+        0x0049,
+        /** @brief The J key. */
+        0x004A,
+        /** @brief The K key. */
+        0x004B,
+        /** @brief The L key. */
+        0x004C,
+        /** @brief The M key. */
+        0x004D,
+        /** @brief The N key. */
+        0x004E,
+        /** @brief The O key. */
+        0x004F,
+        /** @brief The P key. */
+        0x0050,
+        /** @brief The Q key. */
+        0x0051,
+        /** @brief The R key. */
+        0x0052,
+        /** @brief The S key. */
+        0x0053,
+        /** @brief The T key. */
+        0x0054,
+        /** @brief The U key. */
+        0x0055,
+        /** @brief The V key. */
+        0x0056,
+        /** @brief The W key. */
+        0x0057,
+        /** @brief The X key. */
+        0x0058,
+        /** @brief The Y key. */
+        0x0059,
+        /** @brief The Z key. */
+        0x005A,
 
-        0x0030, KEY_0,
-        0x0031, KEY_1,
-        0x0032, KEY_2,
-        0x0033, KEY_3,
-        0x0034, KEY_4,
-        0x0035, KEY_5,
-        0x0036, KEY_6,
-        0x0037, KEY_7,
-        0x0038, KEY_8,
-        0x0039, KEY_9,
+        /** @brief The left Windows/Super key. */
+        0xffeb,
+        /** @brief The right Windows/Super key. */
+        0xffec,
+        KEYS_MAX_KEYS,
 
-        0x0041, KEY_A,
-        0x0042, KEY_B,
-        0x0043, KEY_C,
-        0x0044, KEY_D,
-        0x0045, KEY_E,
-        0x0046, KEY_F,
-        0x0047, KEY_G,
-        0x0048, KEY_H,
-        0x0049, KEY_I,
-        0x004a, KEY_J,
-        0x004b, KEY_K,
-        0x004c, KEY_L,
-        0x004d, KEY_M,
-        0x004e, KEY_N,
-        0x004f, KEY_O,
-        0x0050, KEY_P,
-        0x0051, KEY_Q,
-        0x0052, KEY_R,
-        0x0053, KEY_S,
-        0x0054, KEY_T,
-        0x0055, KEY_U,
-        0x0056, KEY_V,
-        0x0057, KEY_W,
-        0x0058, KEY_X,
-        0x0059, KEY_Y,
-        0x005a, KEY_Z
+        /** @brief The sleep key. */
+        KEYS_MAX_KEYS,
+
+        /** @brief The numberpad 0 key. */
+        0xff9e,
+        /** @brief The numberpad 1 key. */
+        0xff9c,
+        /** @brief The numberpad 2 key. */
+        0xff99,
+        /** @brief The numberpad 3 key. */
+        0xff9b,
+        /** @brief The numberpad 4 key. */
+        0xff96,
+        /** @brief The numberpad 5 key. */
+        0xff9d,
+        /** @brief The numberpad 6 key. */
+        0xff98,
+        /** @brief The numberpad 7 key. */
+        0xff95,
+        /** @brief The numberpad 8 key. */
+        0xff97,
+        /** @brief The numberpad 9 key. */
+        0xff9a,
+        /** @brief The numberpad multiply key. */
+        0xffaa,
+        /** @brief The numberpad add key. */
+        0xffab,
+        /** @brief The numberpad separator key. */
+        0xffac,
+        /** @brief The numberpad subtract key. */
+        0xffad,
+        /** @brief The numberpad decimal key. */
+        0xff9f,
+        /** @brief The numberpad divide key. */
+        0xffaf,
+
+        /** @brief The F1 key. */
+        0xffbe,
+        /** @brief The F2 key. */
+        0xffbf,
+        /** @brief The F3 key. */
+        0xffc0,
+        /** @brief The F4 key. */
+        0xffc1,
+        /** @brief The F5 key. */
+        0xffc2,
+        /** @brief The F6 key. */
+        0xffc3,
+        /** @brief The F7 key. */
+        0xffc4,
+        /** @brief The F8 key. */
+        0xffc5,
+        /** @brief The F9 key. */
+        0xffc6,
+        /** @brief The F10 key. */
+        0xffc7,
+        /** @brief The F11 key. */
+        0xffc8,
+        /** @brief The F12 key. */
+        0xffc9,
+        /** @brief The F13 key. */
+        0xffca,
+        /** @brief The F14 key. */
+        0xffcb,
+        /** @brief The F15 key. */
+        0xffcc,
+        /** @brief The F16 key. */
+        0xffcd,
+        /** @brief The F17 key. */
+        0xffce,
+        /** @brief The F18 key. */
+        0xffcf,
+        /** @brief The F19 key. */
+        0xffd0,
+        /** @brief The F20 key. */
+        0xffd1,
+        /** @brief The F21 key. */
+        0xffd2,
+        /** @brief The F22 key. */
+        0xffd3,
+        /** @brief The F23 key. */
+        0xffd4,
+        /** @brief The F24 key. */
+        0xffd5,
+
+        /** @brief The number lock key. */
+        0xff7f,
+
+        /** @brief The scroll lock key. */
+        0xff14,
+
+        /** @brief The numberpad equal key. */
+        0xffbd,
+
+        /** @brief The left shift key. */
+        0xffe1,
+        /** @brief The right shift key. */
+        0xffe2,
+        /** @brief The left control key. */
+        0xffe3,
+        /** @brief The right control key. */
+        0xffe4,
+        /** @brief The left alt key. */
+        0xffe9,
+        /** @brief The right alt key. */
+        0xfe03,
+
+        /** @brief The semicolon key. */
+        0x003b,
+        /** @brief The plus key. */
+        0x002b,
+        /** @brief The comma key. */
+        0x002c,
+        /** @brief The minus key. */
+        0x002d,
+        /** @brief The period key. */
+        0x002e,
+        /** @brief The slash key. */
+        0x002f,
+
+        /** @brief The grave key. */
+        0x0060
 };
 
 typedef struct platform_state {
@@ -514,13 +648,13 @@ keys translate_keycode(u32 x_keycode) {
             upper -= (0x0061 - 0x0041);
         }
     }
-    for (u32 i = 0; i < MAX_KEY_LOOKUP; ++i) {
+    for (u32 i = 0; i < KEYS_MAX_KEYS; ++i) {
         if (key_lookup_table[i] == upper) {
-            return key_lookup_table[i + 1];
+            return i;
         }
     }
 
-    return KEYS_MAX_KEYS;
+    return 0;
 }
 
 #endif

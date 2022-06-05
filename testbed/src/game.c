@@ -24,12 +24,12 @@ b8 game_update(game* game_inst, f32 delta_time) {
     static u64 alloc_count = 0;
     u64 prev_alloc_count = alloc_count;
     alloc_count = get_memory_alloc_count();
-    if (input_is_key_up('M') && input_was_key_down('M')) {
+    if (input_is_key_up(KEY_M) && input_was_key_down(KEY_M)) {
         KDEBUG("Allocations: %llu (%llu this frame)", alloc_count, alloc_count - prev_alloc_count);
     }
 
     // TODO: temp
-    if (input_is_key_up('T') && input_was_key_down('T')) {
+    if (input_is_key_up(KEY_T) && input_was_key_down(KEY_T)) {
         KDEBUG("Swapping texture!");
         event_context context = {};
         event_fire(EVENT_CODE_DEBUG0, game_inst, context);
@@ -39,11 +39,11 @@ b8 game_update(game* game_inst, f32 delta_time) {
     game_state* state = (game_state*)game_inst->state;
 
     // HACK: temp hack to move camera around.
-    if (input_is_key_down('A') || input_is_key_down(KEY_LEFT)) {
+    if (input_is_key_down(KEY_A) || input_is_key_down(KEY_LEFT)) {
         camera_yaw(state->world_camera, 1.0f * delta_time);
     }
 
-    if (input_is_key_down('D') || input_is_key_down(KEY_RIGHT)) {
+    if (input_is_key_down(KEY_D) || input_is_key_down(KEY_RIGHT)) {
         camera_yaw(state->world_camera, -1.0f * delta_time);
     }
 
@@ -57,19 +57,19 @@ b8 game_update(game* game_inst, f32 delta_time) {
 
     static const f32 temp_move_speed = 50.0f;
 
-    if (input_is_key_down('W')) {
+    if (input_is_key_down(KEY_W)) {
         camera_move_forward(state->world_camera, temp_move_speed * delta_time);
     }
 
-    if (input_is_key_down('S')) {
+    if (input_is_key_down(KEY_S)) {
         camera_move_backward(state->world_camera, temp_move_speed * delta_time);
     }
 
-    if (input_is_key_down('Q')) {
+    if (input_is_key_down(KEY_Q)) {
         camera_move_left(state->world_camera, temp_move_speed * delta_time);
     }
 
-    if (input_is_key_down('E')) {
+    if (input_is_key_down(KEY_E)) {
         camera_move_right(state->world_camera, temp_move_speed * delta_time);
     }
 
@@ -77,12 +77,12 @@ b8 game_update(game* game_inst, f32 delta_time) {
         camera_move_up(state->world_camera, temp_move_speed * delta_time);
     }
 
-    if (input_is_key_down('X')) {
+    if (input_is_key_down(KEY_X)) {
         camera_move_down(state->world_camera, temp_move_speed * delta_time);
     }
 
     // TODO: temp
-    if (input_is_key_up('P') && input_was_key_down('P')) {
+    if (input_is_key_up(KEY_P) && input_was_key_down(KEY_P)) {
         KDEBUG(
             "Pos:[%.2f, %.2f, %.2f",
             state->world_camera->position.x,
@@ -91,19 +91,19 @@ b8 game_update(game* game_inst, f32 delta_time) {
     }
 
     // RENDERER DEBUG FUNCTIONS
-    if (input_is_key_up('1') && input_was_key_down('1')) {
+    if (input_is_key_up(KEY_1) && input_was_key_down(KEY_1)) {
         event_context data = {};
         data.data.i32[0] = RENDERER_VIEW_MODE_LIGHTING;
         event_fire(EVENT_CODE_SET_RENDER_MODE, game_inst, data);
     }
 
-    if (input_is_key_up('2') && input_was_key_down('2')) {
+    if (input_is_key_up(KEY_2) && input_was_key_down(KEY_2)) {
         event_context data = {};
         data.data.i32[0] = RENDERER_VIEW_MODE_NORMALS;
         event_fire(EVENT_CODE_SET_RENDER_MODE, game_inst, data);
     }
 
-    if (input_is_key_up('0') && input_was_key_down('0')) {
+    if (input_is_key_up(KEY_0) && input_was_key_down(KEY_0)) {
         event_context data = {};
         data.data.i32[0] = RENDERER_VIEW_MODE_DEFAULT;
         event_fire(EVENT_CODE_SET_RENDER_MODE, game_inst, data);

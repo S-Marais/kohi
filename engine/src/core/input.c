@@ -4,7 +4,7 @@
 #include "core/logger.h"
 
 typedef struct keyboard_state {
-    b8 keys[256];
+    b8 keys[KEYS_MAX_KEYS];
 } keyboard_state;
 
 typedef struct mouse_state {
